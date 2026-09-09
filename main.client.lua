@@ -734,3 +734,8 @@ dropdownA = Tabs.ExampleTab:Dropdown({
 	Value = { "All" },
 	Callback = function(option) end,
 })
+
+
+
+-- Halimbawa, kung gusto mo ang ExampleTab ang naka-select:
+Tabs.ExampleTab:Select()
