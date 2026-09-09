@@ -737,5 +737,7 @@ dropdownA = Tabs.ExampleTab:Dropdown({
 
 
 
--- Halimbawa, kung gusto mo ang ExampleTab ang naka-select:
-Tabs.ExampleTab:Select()
+task.defer(function()
+	Tabs.ExampleTab:Select()
+end)
+
