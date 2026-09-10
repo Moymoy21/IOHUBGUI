@@ -737,6 +737,83 @@ dropdownA = Tabs.ExampleTab:Dropdown({
 
 
 
+-- */  Services & Variables  /* --
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local safeZonePosition = CFrame.new(-1534.616, -30.171, -3539.305)
+local featureEnabled = false
+local highlightInstance = nil
+
+-- Helper function para makuha ang Kimono target nang ligtas
+local function getKimonoTarget()
+	local success, result = pcall(function()
+		return Workspace["{0x689984738226}"]["{0x172148422599}"]["{0x535175638359}"].Kimono
+	end)
+	if success then
+		return result
+	end
+	return nil
+end
+
+-- RenderStepped loop para sa ESP update at 15 studs SafeZone check
+RunService.RenderStepped:Connect(function()
+	local kimono = getKimonoTarget()
+	local character = LocalPlayer.Character
+	
+	if featureEnabled and kimono then
+		-- 1. I-ensure na laging active ang Highlight habang naka-on ang toggle
+		if not highlightInstance then
+			highlightInstance = Instance.new("Highlight")
+			highlightInstance.Name = "KimonoESP_Visual"
+			highlightInstance.FillColor = Color3.fromHex("#30FF6A")
+			highlightInstance.OutlineColor = Color3.fromRGB(255, 255, 255)
+			highlightInstance.Parent = kimono
+		end
+		
+		-- 2. Auto SafeZone Check (15 studs range)
+		if character and character:FindFirstChild("HumanoidRootPart") then
+			local rootPart = character.HumanoidRootPart
+			local distance = (rootPart.Position - kimono.Position).Magnitude
+			
+			if distance <= 15 then
+				rootPart.CFrame = safeZonePosition
+			end
+		end
+	else
+		-- Kapag naka-off ang toggle, tanggalin ang ESP highlight
+		if highlightInstance then
+			highlightInstance:Destroy()
+			highlightInstance = nil
+		end
+	end
+end)
+
+
+-- ==========================================
+-- UI TOGGLE SA EXAMPLE TAB
+-- ==========================================
+Tabs.ExampleTab:Section({
+	Title = "Kimono Features",
+})
+
+-- Iisang toggle na para sa ESP + Auto SafeZone na
+Tabs.ExampleTab:Toggle({
+	Title = "Kimono ESP & Auto Safezone",
+	Desc = "Enables ESP and teleports you when within 15 studs",
+	Value = false,
+	Callback = function(state)
+		featureEnabled = state
+	end,
+})
+
+
+
+
+
+
 task.defer(function()
 	Tabs.ExampleTab:Select()
 end)
